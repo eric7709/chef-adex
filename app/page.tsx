@@ -1116,6 +1116,52 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'video', label: 'Videos' },
 ]
 
+// Smaller, compressed version of a video for the grid tiles (the full version plays in the lightbox)
+const tileVideoFor = (url: string) => url.replace('/video/upload/', '/video/upload/q_auto:eco,w_600/')
+
+// Autoplays silently on a loop, but only while the tile is on screen, and only downloads once it nears the viewport
+function AutoVideo({ src, poster }: { src: string; poster: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
+  const [inView, setInView] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    v.muted = true
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setInView(e.isIntersecting)
+        if (e.isIntersecting) setLoaded(true)
+      },
+      { threshold: 0.35 }
+    )
+    io.observe(v)
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const v = ref.current
+    if (!v || !loaded) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (inView && !reduce) v.play().catch(() => {})
+    else v.pause()
+  }, [inView, loaded])
+
+  return (
+    <video
+      ref={ref}
+      src={loaded ? src : undefined}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload="none"
+      className="absolute inset-0 h-full w-full object-cover brightness-[0.92] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
+    />
+  )
+}
+
 function Lightbox({
   items,
   index,
@@ -1247,21 +1293,23 @@ function Portfolio() {
               className={`group relative m-0 cursor-pointer overflow-hidden rounded-sm bg-[#f3efe6] ${i === 0 && filter === 'all' ? 'col-span-2 aspect-[16/10] lg:row-span-2 lg:aspect-auto' : 'aspect-square'
                 }`}
             >
-              <Image
-                src={p.type === 'video' ? p.poster! : p.src}
-                alt={p.alt}
-                fill
-                sizes="(max-width: 1024px) 50vw, 400px"
-                className="object-cover brightness-[0.92] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
-              />
+              {p.type === 'video' ? (
+                <AutoVideo src={tileVideoFor(p.src)} poster={p.poster!} />
+              ) : (
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 400px"
+                  className="object-cover brightness-[0.92] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0b1426]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               {p.type === 'video' && (
-                <span className="absolute inset-0 grid place-items-center">
-                  <span className="grid h-14 w-14 place-items-center rounded-full border border-white/50 bg-black/35 text-white backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-[#e11d48] group-hover:text-white">
-                    <svg viewBox="0 0 24 24" className="ml-0.5 h-5 w-5" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
+                <span className="pointer-events-none absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-white/50 bg-black/35 text-white backdrop-blur-md">
+                  <svg viewBox="0 0 24 24" className="ml-0.5 h-3.5 w-3.5" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
                 </span>
               )}
             </figure>
