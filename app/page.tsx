@@ -1,7 +1,43 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+
+/* ============================================================
+   Media (Cloudinary)
+   ============================================================ */
+
+const IMAGE_URLS = [
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968169/WhatsApp_Image_2026-10-14_at_09.16.46_1_yzgfkg.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968170/WhatsApp_Image_2026-10-14_at_09.16.43_i4xdrr.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968170/WhatsApp_Image_2026-10-14_at_09.16.47_1_tfnv47.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968170/WhatsApp_Image_2026-10-14_at_09.16.46_p48zro.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968176/WhatsApp_Image_2026-10-14_at_09.24.07_quvevf.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968173/WhatsApp_Image_2026-10-14_at_09.16.47_mcqicz.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968171/WhatsApp_Image_2026-10-14_at_09.16.47_2_bxd5vw.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968170/WhatsApp_Image_2026-10-14_at_09.16.43_1_pvhi5h.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968170/WhatsApp_Image_2026-10-14_at_09.16.45_tiohhy.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968178/WhatsApp_Image_2026-10-14_at_09.23.39_pf4tkc.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968178/WhatsApp_Image_2026-10-14_at_09.24.08_1_zg5grc.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968177/WhatsApp_Image_2026-10-14_at_09.24.07_1_n4bvan.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968177/WhatsApp_Image_2026-10-14_at_09.24.08_c4xfw2.jpg',
+  'https://res.cloudinary.com/ddagbflm8/image/upload/v1791968176/WhatsApp_Image_2026-10-14_at_09.24.09_ttxulm.jpg',
+]
+
+const VIDEO_URLS = [
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968184/WhatsApp_Video_2026-10-14_at_08.01.21_uqrpvj.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968184/WhatsApp_Video_2026-10-14_at_08.01.07_ivms84.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968184/WhatsApp_Video_2026-10-14_at_09.23.30_fos636.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968183/WhatsApp_Video_2026-10-14_at_09.16.55_gosftu.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968183/WhatsApp_Video_2026-10-14_at_09.16.40_um9cqi.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968183/WhatsApp_Video_2026-10-14_at_09.23.25_mvkohs.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968186/WhatsApp_Video_2026-10-14_at_09.24.05_ycheft.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968186/WhatsApp_Video_2026-10-14_at_09.24.01_vck1ei.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968187/WhatsApp_Video_2026-10-14_at_09.24.14_eitpxi.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968185/WhatsApp_Video_2026-10-14_at_09.23.46_em5nr4.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968185/WhatsApp_Video_2026-10-14_at_09.23.10_pyv1sp.mp4',
+  'https://res.cloudinary.com/ddagbflm8/video/upload/v1791968184/WhatsApp_Video_2026-10-14_at_09.23.36_nn4ncr.mp4',
+]
 
 /* ============================================================
    Inline global styles (globals.css is empty)
@@ -11,10 +47,10 @@ const STYLES = `
   html { scroll-behavior: smooth; }
 
   body {
-    background: #03060d;
-    color: #e9eef8;
+    background: #ffffff;
+    color: #0b1426;
     font-family: var(--font-sans), system-ui, sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: 0.005em;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -37,16 +73,16 @@ const STYLES = `
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  ::selection { background: #d9b26a; color: #03060d; }
+  ::selection { background: #e11d48; color: #ffffff; }
 
   ::-webkit-scrollbar { width: 9px; }
-  ::-webkit-scrollbar-track { background: #03060d; }
+  ::-webkit-scrollbar-track { background: #ffffff; }
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(#132648, #0a1428);
+    background: linear-gradient(#e4dcc8, #cfc3a6);
     border-radius: 20px;
-    border: 2px solid #03060d;
+    border: 2px solid #ffffff;
   }
-  ::-webkit-scrollbar-thumb:hover { background: #a8843f; }
+  ::-webkit-scrollbar-thumb:hover { background: #e11d48; }
 
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -78,17 +114,17 @@ const STYLES = `
 function Eyebrow({ children, center = false }: { children: React.ReactNode; center?: boolean }) {
   return (
     <span
-      className={`mb-4 inline-flex items-center gap-3 text-[0.64rem] font-medium uppercase tracking-[0.32em] text-[#d9b26a] ${center ? 'after:h-px after:w-7 after:bg-gradient-to-l after:from-transparent after:to-[#d9b26a]' : ''
+      className={`mb-4 inline-flex items-center gap-3 text-[0.64rem] font-medium uppercase tracking-[0.32em] text-[#e11d48] ${center ? 'after:h-px after:w-7 after:bg-gradient-to-l after:from-transparent after:to-[#e11d48]' : ''
         }`}
     >
-      {!center && <span className="h-px w-7 bg-gradient-to-r from-transparent to-[#d9b26a]" />}
+      {!center && <span className="h-px w-7 bg-gradient-to-r from-transparent to-[#e11d48]" />}
       {children}
     </span>
   )
 }
 
 function GoldRule() {
-  return <div className="my-5 h-px w-14 bg-gradient-to-r from-[#d9b26a] to-transparent" />
+  return <div className="my-5 h-px w-14 bg-gradient-to-r from-[#e11d48] to-transparent" />
 }
 
 function Arrow({ className = '' }: { className?: string }) {
@@ -143,18 +179,18 @@ function Nav({ active }: { active: string }) {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-[1000] border-b transition-all duration-500 ${scrolled
-            ? 'border-white/[0.075] bg-[rgba(3,6,13,0.85)] py-2.5 backdrop-blur-xl backdrop-saturate-150'
+            ? 'border-black/[0.075] bg-[rgba(255,255,255,0.88)] py-2.5 backdrop-blur-xl backdrop-saturate-150'
             : 'border-transparent py-4'
           }`}
       >
         <div className="mx-auto flex w-[min(1280px,92vw)] items-center justify-between gap-5">
           <a href="#home" className="group flex items-center gap-3 font-serif text-[1.2rem] leading-none tracking-[0.08em]">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#d9b26a]/35 text-[0.72rem] text-[#d9b26a] transition-all duration-500 group-hover:rotate-[-8deg] group-hover:bg-[#d9b26a] group-hover:text-[#03060d]">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#e11d48]/60 text-[0.72rem] text-[#e11d48] transition-all duration-500 group-hover:rotate-[-8deg] group-hover:bg-[#e11d48] group-hover:text-white">
               CA
             </span>
             <span className="flex flex-col">
               Chef Adex
-              <small className="mt-0.5 font-sans text-[0.5rem] font-normal uppercase tracking-[0.32em] text-[#63748f]">
+              <small className="mt-0.5 font-sans text-[0.5rem] font-normal uppercase tracking-[0.32em] text-[#6b7790]">
                 Private Chef · Lagos
               </small>
             </span>
@@ -173,7 +209,7 @@ function Nav({ active }: { active: string }) {
                   >
                     <a
                       href={href}
-                      className={`flex items-center gap-1 py-1 text-[0.68rem] uppercase tracking-[0.2em] transition-colors ${active === id ? 'text-[#f0d6a0]' : 'text-[#8b9cbb] hover:text-[#f0d6a0]'
+                      className={`flex items-center gap-1 py-1 text-[0.68rem] uppercase tracking-[0.2em] transition-colors ${active === id ? 'text-[#e11d48]' : 'text-[#4a5873] hover:text-[#be123c]'
                         }`}
                     >
                       Services
@@ -185,7 +221,7 @@ function Nav({ active }: { active: string }) {
                       className={`absolute left-1/2 top-full w-64 -translate-x-1/2 pt-3 transition-all duration-300 ${servicesOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-1 opacity-0'
                         }`}
                     >
-                      <div className="overflow-hidden rounded-sm border border-white/[0.075] bg-[rgba(5,11,22,0.96)] p-1.5 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.9)] backdrop-blur-xl">
+                      <div className="overflow-hidden rounded-sm border border-black/[0.075] bg-[rgba(255,255,255,0.97)] p-1.5 shadow-[0_30px_60px_-25px_rgba(20,30,50,0.22)] backdrop-blur-xl">
                         {[
                           ['Private Dining', '#private-dining'],
                           ['Culinary Classes', '#culinary-classes'],
@@ -195,7 +231,7 @@ function Nav({ active }: { active: string }) {
                           <a
                             key={label}
                             href={href}
-                            className="block rounded-sm px-3.5 py-2.5 text-[0.8rem] text-[#8b9cbb] transition-colors hover:bg-[#d9b26a]/5 hover:text-[#f0d6a0]"
+                            className="block rounded-sm px-3.5 py-2.5 text-[0.8rem] text-[#4a5873] transition-colors hover:bg-[#e11d48]/10 hover:text-[#be123c]"
                           >
                             {label}
                           </a>
@@ -209,7 +245,7 @@ function Nav({ active }: { active: string }) {
                 <a
                   key={href}
                   href={href}
-                  className={`py-1 text-[0.68rem] uppercase tracking-[0.2em] transition-colors ${active === id ? 'text-[#f0d6a0]' : 'text-[#8b9cbb] hover:text-[#f0d6a0]'
+                  className={`py-1 text-[0.68rem] uppercase tracking-[0.2em] transition-colors ${active === id ? 'text-[#e11d48]' : 'text-[#4a5873] hover:text-[#be123c]'
                     }`}
                 >
                   {label}
@@ -220,7 +256,7 @@ function Nav({ active }: { active: string }) {
 
           <a
             href="#contact"
-            className="group hidden items-center gap-2 rounded-sm bg-gradient-to-br from-[#d9b26a] to-[#a8843f] px-5 py-2.5 text-[0.64rem] font-medium uppercase tracking-[0.18em] text-[#03060d] shadow-[0_10px_30px_-12px_rgba(217,178,106,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-14px_rgba(217,178,106,0.72)] lg:inline-flex"
+            className="group hidden items-center gap-2 rounded-sm bg-gradient-to-br from-[#e11d48] to-[#be123c] px-5 py-2.5 text-[0.64rem] font-medium uppercase tracking-[0.18em] text-white shadow-[0_10px_30px_-12px_rgba(225,29,72,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-14px_rgba(225,29,72,0.72)] lg:inline-flex"
           >
             Book an Experience
             <Arrow />
@@ -229,17 +265,17 @@ function Nav({ active }: { active: string }) {
           <button
             aria-label="Menu"
             onClick={() => setOpen(!open)}
-            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-sm border border-white/10 lg:hidden"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-sm border border-black/10 lg:hidden"
           >
-            <span className={`block h-[1.5px] w-5 bg-[#e9eef8] transition-all duration-500 ${open ? 'translate-y-[6.5px] rotate-45' : ''}`} />
-            <span className={`block h-[1.5px] w-5 bg-[#e9eef8] transition-all duration-500 ${open ? 'opacity-0' : ''}`} />
-            <span className={`block h-[1.5px] w-5 bg-[#e9eef8] transition-all duration-500 ${open ? '-translate-y-[6.5px] -rotate-45' : ''}`} />
+            <span className={`block h-[1.5px] w-5 bg-[#0b1426] transition-all duration-500 ${open ? 'translate-y-[6.5px] rotate-45' : ''}`} />
+            <span className={`block h-[1.5px] w-5 bg-[#0b1426] transition-all duration-500 ${open ? 'opacity-0' : ''}`} />
+            <span className={`block h-[1.5px] w-5 bg-[#0b1426] transition-all duration-500 ${open ? '-translate-y-[6.5px] -rotate-45' : ''}`} />
           </button>
         </div>
       </header>
 
       <div
-        className={`fixed inset-0 z-[999] flex flex-col items-center justify-center gap-2 bg-[rgba(3,6,13,0.97)] backdrop-blur-xl transition-all duration-500 lg:hidden ${open ? 'visible opacity-100' : 'invisible opacity-0'
+        className={`fixed inset-0 z-[999] flex flex-col items-center justify-center gap-2 bg-[rgba(255,255,255,0.98)] backdrop-blur-xl transition-all duration-500 lg:hidden ${open ? 'visible opacity-100' : 'invisible opacity-0'
           }`}
       >
         {NAV_LINKS.map(([label, href], i) => (
@@ -248,7 +284,7 @@ function Nav({ active }: { active: string }) {
             href={href}
             onClick={() => setOpen(false)}
             style={{ transitionDelay: open ? `${0.05 * (i + 1)}s` : '0s' }}
-            className={`py-1.5 font-serif text-2xl text-[#e9eef8] transition-all duration-500 hover:text-[#d9b26a] ${open ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
+            className={`py-1.5 font-serif text-2xl text-[#0b1426] transition-all duration-500 hover:text-[#e11d48] ${open ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
               }`}
           >
             {label}
@@ -258,7 +294,7 @@ function Nav({ active }: { active: string }) {
           href="#contact"
           onClick={() => setOpen(false)}
           style={{ transitionDelay: open ? '0.42s' : '0s' }}
-          className={`mt-2 rounded-sm bg-gradient-to-br from-[#d9b26a] to-[#a8843f] px-7 py-3.5 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-[#03060d] transition-all duration-500 ${open ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
+          className={`mt-2 rounded-sm bg-gradient-to-br from-[#e11d48] to-[#be123c] px-7 py-3.5 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-white transition-all duration-500 ${open ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
             }`}
         >
           Book an Experience
@@ -294,15 +330,80 @@ function WhatsAppFloat() {
    Hero
    ============================================================ */
 
+/* ============================================================
+   Hero video (autoplay, muted, cycles through clips)
+   ============================================================ */
+
+const HERO_CLIPS = VIDEO_URLS.slice(0, 6)
+
+function HeroVideo() {
+  const [i, setI] = useState(0)
+  const [muted, setMuted] = useState(true)
+  const ref = useRef<HTMLVideoElement>(null)
+
+  // Browsers only allow autoplay when muted, so start muted and let the visitor opt in to sound
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    v.muted = muted
+    v.play().catch(() => {
+      // If sound was turned on and the browser blocks playback, fall back to muted
+      v.muted = true
+      setMuted(true)
+      v.play().catch(() => {})
+    })
+  }, [i, muted])
+
+  return (
+    <>
+      <video
+        key={HERO_CLIPS[i]}
+        ref={ref}
+        src={HERO_CLIPS[i]}
+        poster={posterFor(HERO_CLIPS[i])}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        onEnded={() => setI((n) => (n + 1) % HERO_CLIPS.length)}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+
+      <div className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between">
+        <div className="flex gap-1.5">
+          {HERO_CLIPS.map((_, n) => (
+            <button
+              key={n}
+              aria-label={`Play clip ${n + 1}`}
+              onClick={() => setI(n)}
+              className={`h-1 rounded-full transition-all duration-500 ${n === i ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'}`}
+            />
+          ))}
+        </div>
+        <button
+          aria-label={muted ? 'Turn sound on' : 'Turn sound off'}
+          onClick={() => setMuted((m) => !m)}
+          className="grid h-9 w-9 place-items-center rounded-full border border-white/40 bg-black/35 text-white backdrop-blur-md transition-colors hover:bg-[#e11d48]"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+            {muted ? <path d="M22 9l-6 6M16 9l6 6" /> : <path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13" />}
+          </svg>
+        </button>
+      </div>
+    </>
+  )
+}
+
 function Hero() {
   return (
     <section id="home" className="relative flex min-h-svh items-center overflow-hidden pt-[120px] pb-[70px]">
-      <div className="absolute inset-0 bg-[radial-gradient(900px_620px_at_78%_22%,rgba(26,49,96,0.6),transparent_62%),radial-gradient(700px_520px_at_8%_82%,rgba(217,178,106,0.08),transparent_65%),linear-gradient(180deg,#050b16_0%,#03060d_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(900px_620px_at_78%_22%,rgba(200,214,240,0.55),transparent_62%),radial-gradient(700px_520px_at_8%_82%,rgba(225,29,72,0.14),transparent_65%),linear-gradient(180deg,#faf8f3_0%,#ffffff_100%)]" />
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)',
+            'linear-gradient(rgba(0,0,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px)',
           backgroundSize: '80px 80px',
           maskImage: 'radial-gradient(ellipse 80% 70% at 50% 45%, #000 20%, transparent 78%)',
           WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 45%, #000 20%, transparent 78%)',
@@ -311,51 +412,51 @@ function Hero() {
 
       <div className="relative z-10 mx-auto grid w-[min(1280px,92vw)] items-center gap-[clamp(34px,5vw,72px)] lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/[0.075] bg-white/[0.028] px-4 py-2 pl-2.5 text-[0.62rem] uppercase tracking-[0.2em] text-[#8b9cbb] backdrop-blur-md">
-            <span className="inline-flex gap-0.5 text-[0.68rem] text-[#d9b26a]">✦ ✦ ✦</span>
+          <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-black/[0.075] bg-black/[0.028] px-4 py-2 pl-2.5 text-[0.62rem] uppercase tracking-[0.2em] text-[#4a5873] backdrop-blur-md">
+            <span className="inline-flex gap-0.5 text-[0.68rem] text-[#e11d48]">✦ ✦ ✦</span>
             Private Dining · Lagos &amp; Beyond
           </div>
 
           <h1 className="mb-5 font-serif text-[clamp(2.4rem,5.6vw,4.6rem)] font-normal leading-[1.02] tracking-[-0.025em]">
             Private dining,
             <br />
-            <em className="bg-gradient-to-r from-[#f0d6a0] to-[#a8843f] bg-clip-text font-light not-italic text-transparent">
+            <em className="bg-gradient-to-r from-[#be123c] to-[#f43f5e] bg-clip-text font-light not-italic text-transparent">
               curated by Chef Adex.
             </em>
           </h1>
 
-          <p className="mb-8 max-w-[52ch] text-[clamp(0.94rem,1.2vw,1.04rem)] leading-[1.8] text-[#8b9cbb]">
+          <p className="mb-8 max-w-[52ch] text-[clamp(0.94rem,1.2vw,1.04rem)] leading-[1.8] text-[#4a5873]">
             Exceptional dining experiences brought to your table — private dinners, hands-on culinary classes, and menus designed for restaurants that want to be remembered.
           </p>
 
           <div className="mb-11 flex flex-wrap gap-3">
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-sm bg-gradient-to-br from-[#d9b26a] to-[#a8843f] px-7 py-3.5 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-[#03060d] shadow-[0_10px_34px_-12px_rgba(217,178,106,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-14px_rgba(217,178,106,0.72)]"
+              className="group inline-flex items-center gap-2.5 rounded-sm bg-gradient-to-br from-[#e11d48] to-[#be123c] px-7 py-3.5 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-white shadow-[0_10px_34px_-12px_rgba(225,29,72,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-14px_rgba(225,29,72,0.72)]"
             >
               Book an Experience
               <Arrow />
             </a>
             <a
               href="#services"
-              className="group inline-flex items-center gap-2.5 rounded-sm border border-white/15 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#e9eef8] transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d9b26a] hover:bg-[#d9b26a]/5 hover:text-[#d9b26a]"
+              className="group inline-flex items-center gap-2.5 rounded-sm border border-black/15 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#0b1426] transition-all duration-500 hover:-translate-y-0.5 hover:border-[#e11d48] hover:bg-[#e11d48]/10 hover:text-[#e11d48]"
             >
               Explore Services
             </a>
           </div>
 
-          <div className="flex flex-wrap gap-[clamp(24px,3.4vw,46px)] border-t border-white/[0.075] pt-6">
+          <div className="flex flex-wrap gap-[clamp(24px,3.4vw,46px)] border-t border-black/[0.075] pt-6">
             {[
               { n: '10', sup: '+', l: 'Years in kitchens' },
               { n: '450', sup: '+', l: 'Dinners curated' },
               { n: '30', sup: '+', l: 'Restaurants advised' },
             ].map((s) => (
               <div key={s.l}>
-                <div className="flex items-baseline gap-0.5 font-serif text-[1.75rem] leading-none text-[#f0d6a0]">
+                <div className="flex items-baseline gap-0.5 font-serif text-[1.75rem] leading-none text-[#e11d48]">
                   {s.n}
-                  {s.sup && <sup className="text-[0.8rem] text-[#d9b26a]">{s.sup}</sup>}
+                  {s.sup && <sup className="text-[0.8rem] text-[#e11d48]">{s.sup}</sup>}
                 </div>
-                <span className="mt-1.5 block text-[0.58rem] uppercase tracking-[0.22em] text-[#63748f]">
+                <span className="mt-1.5 block text-[0.58rem] uppercase tracking-[0.22em] text-[#6b7790]">
                   {s.l}
                 </span>
               </div>
@@ -364,22 +465,15 @@ function Hero() {
         </div>
 
         <div className="relative mx-auto w-full max-w-[460px] justify-self-center lg:justify-self-end">
-          <span className="pointer-events-none absolute -inset-[14px] -z-10 border border-[#d9b26a]/25 [inset:-14px_-14px_14px_14px]" />
-          <div className="group relative aspect-[4/5] overflow-hidden rounded-sm bg-gradient-to-br from-[#0e1c37] to-[#050b16] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)]">
-            <Image
-              src="https://www.foodandwine.com/thmb/2jtU6vko25_uXKddmk1fFAhyc0o=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/grilled-quail-with-sweet-and-sour-plum-glaze-FT-RECIPE0721-c49143a72ef44475982b6e8109363b14.jpg"
-              alt="Grilled quail with sweet and sour plum glaze — signature plating by Chef Adex"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 460px"
-              className="object-cover brightness-90 contrast-[1.06] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.045] group-hover:brightness-95 group-hover:saturate-100"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#050b16]/10 via-[#050b16]/55 to-[#050b16]/90" />
+          <span className="pointer-events-none absolute -inset-[14px] -z-10 border border-[#e11d48]/40 [inset:-14px_-14px_14px_14px]" />
+          <div className="group relative aspect-[4/5] overflow-hidden rounded-sm bg-gradient-to-br from-[#efe9dc] to-[#faf8f3] shadow-[0_40px_80px_-40px_rgba(20,30,50,0.22)]">
+            <HeroVideo />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0b1426]/45" />
           </div>
 
-          <div className="anim-float absolute -left-5 bottom-8 flex items-center gap-3 rounded-sm border border-white/[0.075] border-l-2 border-l-[#d9b26a] bg-[rgba(7,14,30,0.9)] px-4 py-3 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.85)] backdrop-blur-xl sm:-left-6">
-            <div className="font-serif text-[1.7rem] leading-none text-[#d9b26a]">1:1</div>
-            <div className="text-[0.6rem] uppercase leading-relaxed tracking-[0.16em] text-[#8b9cbb]">
+          <div className="anim-float absolute -left-5 bottom-8 flex items-center gap-3 rounded-sm border border-black/[0.075] border-l-2 border-l-[#e11d48] bg-[rgba(255,255,255,0.94)] px-4 py-3 shadow-[0_30px_60px_-25px_rgba(20,30,50,0.22)] backdrop-blur-xl sm:-left-6">
+            <div className="font-serif text-[1.7rem] leading-none text-[#e11d48]">1:1</div>
+            <div className="text-[0.6rem] uppercase leading-relaxed tracking-[0.16em] text-[#4a5873]">
               Crafted
               <br />
               for you
@@ -391,10 +485,10 @@ function Hero() {
       <a
         href="#intro"
         aria-label="Scroll"
-        className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-[0.55rem] uppercase tracking-[0.3em] text-[#63748f] md:flex"
+        className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-[0.55rem] uppercase tracking-[0.3em] text-[#6b7790] md:flex"
       >
-        <span className="relative h-12 w-px overflow-hidden bg-gradient-to-b from-[#d9b26a] to-transparent">
-          <span className="anim-rail absolute left-0 h-12 w-full bg-[#f0d6a0]" />
+        <span className="relative h-12 w-px overflow-hidden bg-gradient-to-b from-[#e11d48] to-transparent">
+          <span className="anim-rail absolute left-0 h-12 w-full bg-[#fb7185]" />
         </span>
         Scroll
       </a>
@@ -412,17 +506,17 @@ function Marquee() {
     'Celebrations', 'Hands-on Training', 'Bespoke Menus', 'Restaurant Consulting', 'Intimate Events',
   ]
   return (
-    <div className="marquee-hover relative overflow-hidden border-y border-white/[0.075] bg-gradient-to-r from-[#050b16] via-[#070e1e] to-[#050b16] py-4">
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#050b16] to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#050b16] to-transparent" />
+    <div className="marquee-hover relative overflow-hidden border-y border-black/[0.075] bg-gradient-to-r from-[#faf8f3] via-[#f5f2ea] to-[#faf8f3] py-4">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#faf8f3] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#faf8f3] to-transparent" />
       <div className="anim-scroll flex w-max">
         {[...words, ...words].map((w, i) => (
           <span
             key={i}
-            className="flex items-center gap-7 whitespace-nowrap px-7 font-serif text-[clamp(0.98rem,1.8vw,1.34rem)] tracking-[0.06em] text-[#e9eef8]/35"
+            className="flex items-center gap-7 whitespace-nowrap px-7 font-serif text-[clamp(0.98rem,1.8vw,1.34rem)] tracking-[0.06em] text-[#0b1426]/45"
           >
             {w}
-            <i className="text-[0.55rem] not-italic text-[#d9b26a] opacity-75">◆</i>
+            <i className="text-[0.55rem] not-italic text-[#e11d48] opacity-90">◆</i>
           </span>
         ))}
       </div>
@@ -440,37 +534,37 @@ const CORE_SERVICES = [
     title: 'Private Dining',
     text: 'Personalised dining experiences for intimate occasions, celebrations and special events.',
     href: '#private-dining',
-    img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80',
+    img: IMAGE_URLS[1],
   },
   {
     n: '02',
     title: 'Culinary Classes',
     text: 'Hands-on cooking experiences designed around your interests, goals and skill level.',
     href: '#culinary-classes',
-    img: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=80',
+    img: IMAGE_URLS[2],
   },
   {
     n: '03',
     title: 'Menu Curation',
     text: 'Professional menu development and culinary consulting for restaurants and food businesses.',
     href: '#menu-curation',
-    img: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80',
+    img: IMAGE_URLS[3],
   },
 ]
 
 function Intro() {
   return (
-    <section id="intro" className="bg-gradient-to-b from-[#03060d] to-[#050b16] py-[clamp(56px,7vw,96px)]">
+    <section id="intro" className="bg-gradient-to-b from-white to-[#faf8f3] py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-12 grid items-end gap-8 lg:grid-cols-2">
           <div>
             <Eyebrow>Introduction</Eyebrow>
             <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
               Elevated dining.{' '}
-              <em className="not-italic text-[#f0d6a0]">Personalised to you.</em>
+              <em className="not-italic text-[#e11d48]">Personalised to you.</em>
             </h2>
           </div>
-          <p className="max-w-[58ch] text-[0.95rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="max-w-[58ch] text-[0.95rem] leading-[1.8] text-[#4a5873]">
             Chef Adex brings restaurant-quality dining, culinary expertise and personalised experiences to every table — whether it&apos;s an intimate dinner for two, a milestone celebration, a hands-on class, or a full menu for a restaurant.
           </p>
         </div>
@@ -480,7 +574,7 @@ function Intro() {
             <a
               key={s.n}
               href={s.href}
-              className="group relative overflow-hidden rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#0a1428]/70 to-[#03060d]/50 transition-all duration-500 hover:-translate-y-1.5 hover:border-[#d9b26a]/30 hover:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)]"
+              className="group relative overflow-hidden rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/70 to-white/50 transition-all duration-500 hover:-translate-y-1.5 hover:border-[#e11d48]/50 hover:shadow-[0_30px_60px_-30px_rgba(20,30,50,0.22)]"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <Image
@@ -488,16 +582,16 @@ function Intro() {
                   alt={s.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 400px"
-                  className="object-cover brightness-[0.78] saturate-[0.85] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-95 group-hover:saturate-100"
+                  className="object-cover brightness-[0.9] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
                 />
-                <span className="absolute left-3.5 top-3.5 rounded-full border border-[#d9b26a]/30 bg-[rgba(3,6,13,0.72)] px-2.5 py-0.5 text-[0.55rem] uppercase tracking-[0.22em] text-[#f0d6a0] backdrop-blur-md">
+                <span className="absolute left-3.5 top-3.5 rounded-full border border-[#e11d48]/40 bg-[rgba(255,255,255,0.88)] px-2.5 py-0.5 text-[0.55rem] uppercase tracking-[0.22em] text-[#e11d48] backdrop-blur-md">
                   {s.n}
                 </span>
               </div>
               <div className="p-5">
-                <h3 className="mb-2 font-serif text-[1.35rem] text-[#e9eef8]">{s.title}</h3>
-                <p className="mb-4 text-[0.86rem] leading-[1.7] text-[#8b9cbb]">{s.text}</p>
-                <span className="inline-flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 group-hover:gap-3">
+                <h3 className="mb-2 font-serif text-[1.35rem] text-[#0b1426]">{s.title}</h3>
+                <p className="mb-4 text-[0.86rem] leading-[1.7] text-[#4a5873]">{s.text}</p>
+                <span className="inline-flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 group-hover:gap-3">
                   Explore
                   <Arrow />
                 </span>
@@ -509,7 +603,7 @@ function Intro() {
         <div className="mt-10 flex justify-center">
           <a
             href="#services"
-            className="group inline-flex items-center gap-2.5 rounded-sm border border-[#d9b26a]/35 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#d9b26a] hover:text-[#03060d]"
+            className="group inline-flex items-center gap-2.5 rounded-sm border border-[#e11d48]/50 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#e11d48] hover:text-white"
           >
             Explore Our Services
             <Arrow />
@@ -533,41 +627,41 @@ const CREDENTIALS = [
 
 function About() {
   return (
-    <section id="about" className="bg-gradient-to-b from-[#050b16] to-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section id="about" className="bg-gradient-to-b from-[#faf8f3] to-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto grid w-[min(1280px,92vw)] items-center gap-[clamp(34px,5vw,72px)] lg:grid-cols-[1fr_1.05fr]">
         <div className="relative grid grid-cols-2 grid-rows-[auto_auto] gap-3">
-          <div className="group relative col-start-1 row-span-2 aspect-[3/4.4] overflow-hidden rounded-sm bg-gradient-to-br from-[#0e1c37] to-[#050b16]">
+          <div className="group relative col-start-1 row-span-2 aspect-[3/4.4] overflow-hidden rounded-sm bg-gradient-to-br from-[#efe9dc] to-[#faf8f3]">
             <Image
-              src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=900&q=80"
+              src={IMAGE_URLS[4]}
               alt="Chef Adex portrait"
               fill
               sizes="(max-width: 1024px) 50vw, 340px"
-              className="object-cover brightness-[0.88] contrast-[1.05] saturate-[0.85] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-95 group-hover:saturate-100"
+              className="object-cover brightness-[0.95] contrast-[1.05] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
             />
           </div>
-          <div className="group relative aspect-square overflow-hidden rounded-sm bg-gradient-to-br from-[#0e1c37] to-[#050b16]">
+          <div className="group relative aspect-square overflow-hidden rounded-sm bg-gradient-to-br from-[#efe9dc] to-[#faf8f3]">
             <Image
-              src="https://images.unsplash.com/photo-1556909212-d5b604d0c90d?auto=format&fit=crop&w=600&q=80"
+              src={IMAGE_URLS[5]}
               alt="Chef in the kitchen"
               fill
               sizes="(max-width: 1024px) 50vw, 240px"
-              className="object-cover brightness-[0.88] contrast-[1.05] saturate-[0.85] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-95 group-hover:saturate-100"
+              className="object-cover brightness-[0.95] contrast-[1.05] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
             />
           </div>
-          <div className="group relative aspect-square overflow-hidden rounded-sm bg-gradient-to-br from-[#0e1c37] to-[#050b16]">
+          <div className="group relative aspect-square overflow-hidden rounded-sm bg-gradient-to-br from-[#efe9dc] to-[#faf8f3]">
             <Image
-              src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"
+              src={IMAGE_URLS[6]}
               alt="Plated dish by Chef Adex"
               fill
               sizes="(max-width: 1024px) 50vw, 240px"
-              className="object-cover brightness-[0.88] contrast-[1.05] saturate-[0.85] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-95 group-hover:saturate-100"
+              className="object-cover brightness-[0.95] contrast-[1.05] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
             />
           </div>
 
-          <div className="absolute -bottom-3 -right-3 z-10 grid h-[100px] w-[100px] place-items-center rounded-full border border-[#d9b26a]/30 bg-[#03060d] text-center font-serif leading-tight">
+          <div className="absolute -bottom-3 -right-3 z-10 grid h-[100px] w-[100px] place-items-center rounded-full border border-[#e11d48]/50 bg-white text-center font-serif leading-tight shadow-[0_10px_30px_-12px_rgba(20,30,50,0.22)]">
             <div>
-              <b className="block font-sans text-[0.5rem] font-normal tracking-[0.26em] text-[#63748f]">SINCE</b>
-              <i className="not-italic text-[1.4rem] text-[#d9b26a]">2014</i>
+              <b className="block font-sans text-[0.5rem] font-normal tracking-[0.26em] text-[#6b7790]">SINCE</b>
+              <i className="not-italic text-[1.4rem] text-[#e11d48]">2014</i>
             </div>
           </div>
         </div>
@@ -576,30 +670,30 @@ function About() {
           <Eyebrow>Meet the Chef</Eyebrow>
           <h2 className="mb-4 font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             Bringing restaurant-quality dining to{' '}
-            <em className="not-italic text-[#f0d6a0]">every table.</em>
+            <em className="not-italic text-[#e11d48]">every table.</em>
           </h2>
           <GoldRule />
 
-          <p className="max-w-[58ch] text-[0.95rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="max-w-[58ch] text-[0.95rem] leading-[1.8] text-[#4a5873]">
             Chef Adex is a private chef, culinary educator and menu consultant based in Lagos. His cooking draws on classical French discipline and modern global technique, layered over the bold, generous flavours of West African cooking.
           </p>
-          <p className="mt-3 max-w-[58ch] text-[0.95rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="mt-3 max-w-[58ch] text-[0.95rem] leading-[1.8] text-[#4a5873]">
             He has cooked in fine-dining kitchens, trained private clients and restaurant brigades, and consulted on menus for businesses across Nigeria.
           </p>
 
-          <blockquote className="mt-7 rounded-r-sm border-l-2 border-[#d9b26a] bg-[rgba(217,178,106,0.045)] px-5 py-4 font-serif text-[1rem] italic leading-[1.65] text-[#8b9cbb]">
+          <blockquote className="mt-7 rounded-r-sm border-l-2 border-[#e11d48] bg-[rgba(225,29,72,0.1)] px-5 py-4 font-serif text-[1rem] italic leading-[1.65] text-[#4a5873]">
             &ldquo;Great food is not about showing off. It&apos;s about listening to the people at the table — then cooking for them, not at them.&rdquo;
           </blockquote>
 
           <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {CREDENTIALS.map((c) => (
               <div key={c.t} className="flex gap-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#d9b26a]/30 text-[0.8rem] text-[#d9b26a]">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#e11d48]/50 text-[0.8rem] text-[#e11d48]">
                   {c.ic}
                 </span>
                 <div>
-                  <strong className="block font-serif text-[0.95rem] font-medium text-[#e9eef8]">{c.t}</strong>
-                  <p className="text-[0.78rem] leading-snug text-[#63748f]">{c.s}</p>
+                  <strong className="block font-serif text-[0.95rem] font-medium text-[#0b1426]">{c.t}</strong>
+                  <p className="text-[0.78rem] leading-snug text-[#6b7790]">{c.s}</p>
                 </div>
               </div>
             ))}
@@ -608,7 +702,7 @@ function About() {
           <div className="mt-7">
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-sm bg-gradient-to-br from-[#d9b26a] to-[#a8843f] px-7 py-3.5 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-[#03060d] shadow-[0_10px_34px_-12px_rgba(217,178,106,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-14px_rgba(217,178,106,0.72)]"
+              className="group inline-flex items-center gap-2.5 rounded-sm bg-gradient-to-br from-[#e11d48] to-[#be123c] px-7 py-3.5 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-white shadow-[0_10px_34px_-12px_rgba(225,29,72,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-14px_rgba(225,29,72,0.72)]"
             >
               Discover Chef Adex
               <Arrow />
@@ -657,14 +751,14 @@ function CategoryGrid({
       {items.map((it) => (
         <div
           key={it.t}
-          className="group relative overflow-hidden rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#0a1428]/60 to-[#03060d]/30 p-5 transition-all duration-500 hover:-translate-y-1 hover:border-[#d9b26a]/30 hover:from-[#132648]/60"
+          className="group relative overflow-hidden rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/60 to-white/30 p-5 transition-all duration-500 hover:-translate-y-1 hover:border-[#e11d48]/50 hover:from-[#ebe5d6]/60"
         >
-          <span className="absolute inset-x-0 top-0 h-px -translate-x-full bg-gradient-to-r from-transparent via-[#d9b26a] to-transparent transition-transform duration-700 group-hover:translate-x-0" />
-          <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#d9b26a]/30 font-serif text-[0.85rem] text-[#d9b26a] transition-all duration-500 group-hover:-rotate-[10deg] group-hover:bg-[#d9b26a] group-hover:text-[#03060d]">
+          <span className="absolute inset-x-0 top-0 h-px -translate-x-full bg-gradient-to-r from-transparent via-[#e11d48] to-transparent transition-transform duration-700 group-hover:translate-x-0" />
+          <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e11d48]/50 font-serif text-[0.85rem] text-[#e11d48] transition-all duration-500 group-hover:-rotate-[10deg] group-hover:bg-[#e11d48] group-hover:text-white">
             {it.ic}
           </div>
-          <h4 className="mb-1.5 font-serif text-[1.12rem] text-[#e9eef8]">{it.t}</h4>
-          <p className="text-[0.84rem] leading-[1.65] text-[#8b9cbb]">{it.d}</p>
+          <h4 className="mb-1.5 font-serif text-[1.12rem] text-[#0b1426]">{it.t}</h4>
+          <p className="text-[0.84rem] leading-[1.65] text-[#4a5873]">{it.d}</p>
         </div>
       ))}
     </div>
@@ -673,7 +767,7 @@ function CategoryGrid({
 
 function Services() {
   return (
-    <section id="services" className="bg-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section id="services" className="bg-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         {/* PRIVATE DINING */}
         <div id="private-dining" className="scroll-mt-20">
@@ -682,10 +776,10 @@ function Services() {
               <Eyebrow>Service 01 · Private Dining</Eyebrow>
               <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
                 A dining experience,{' '}
-                <em className="not-italic text-[#f0d6a0]">created around you.</em>
+                <em className="not-italic text-[#e11d48]">created around you.</em>
               </h2>
             </div>
-            <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+            <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
               Whether it&apos;s an intimate dinner for two, a milestone celebration or a corporate gathering, Chef Adex creates personalised dining experiences around the occasion, guests and location.
             </p>
           </div>
@@ -693,7 +787,7 @@ function Services() {
           <div className="mt-9 flex justify-center">
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#d9b26a]/35 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#d9b26a] hover:text-[#03060d]"
+              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#e11d48]/50 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#e11d48] hover:text-white"
             >
               Plan Your Private Dining Experience
               <Arrow />
@@ -701,7 +795,7 @@ function Services() {
           </div>
         </div>
 
-        <div className="my-[clamp(56px,7vw,96px)] h-px w-full bg-gradient-to-r from-transparent via-white/[0.075] to-transparent" />
+        <div className="my-[clamp(56px,7vw,96px)] h-px w-full bg-gradient-to-r from-transparent via-black/[0.075] to-transparent" />
 
         {/* CULINARY CLASSES */}
         <div id="culinary-classes" className="scroll-mt-20">
@@ -710,10 +804,10 @@ function Services() {
               <Eyebrow>Service 02 · Culinary Classes</Eyebrow>
               <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
                 Learn. Create.{' '}
-                <em className="not-italic text-[#f0d6a0]">Master.</em>
+                <em className="not-italic text-[#e11d48]">Master.</em>
               </h2>
             </div>
-            <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+            <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
               Private, hands-on culinary experiences designed around your interests, goals and skill level — for complete beginners, passionate home cooks and aspiring professionals.
             </p>
           </div>
@@ -721,7 +815,7 @@ function Services() {
           <div className="mt-9 flex justify-center">
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#d9b26a]/35 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#d9b26a] hover:text-[#03060d]"
+              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#e11d48]/50 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#e11d48] hover:text-white"
             >
               Book a Culinary Class
               <Arrow />
@@ -729,7 +823,7 @@ function Services() {
           </div>
         </div>
 
-        <div className="my-[clamp(56px,7vw,96px)] h-px w-full bg-gradient-to-r from-transparent via-white/[0.075] to-transparent" />
+        <div className="my-[clamp(56px,7vw,96px)] h-px w-full bg-gradient-to-r from-transparent via-black/[0.075] to-transparent" />
 
         {/* MENU CURATION */}
         <div id="menu-curation" className="scroll-mt-20">
@@ -738,10 +832,10 @@ function Services() {
               <Eyebrow>Service 03 · Restaurant Menu Curation</Eyebrow>
               <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
                 Create a menu people{' '}
-                <em className="not-italic text-[#f0d6a0]">come back for.</em>
+                <em className="not-italic text-[#e11d48]">come back for.</em>
               </h2>
             </div>
-            <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+            <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
               Chef Adex works with restaurants and food businesses to develop menus that are creative, commercially viable and aligned with their brand.
             </p>
           </div>
@@ -749,7 +843,7 @@ function Services() {
           <div className="mt-9 flex justify-center">
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#d9b26a]/35 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#d9b26a] hover:text-[#03060d]"
+              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#e11d48]/50 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#e11d48] hover:text-white"
             >
               Work With Chef Adex
               <Arrow />
@@ -774,46 +868,46 @@ const SAMPLE_MENU = [
 
 function Menus() {
   return (
-    <section id="menus" className="bg-gradient-to-b from-[#03060d] to-[#050b16] py-[clamp(56px,7vw,96px)]">
+    <section id="menus" className="bg-gradient-to-b from-white to-[#faf8f3] py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto grid w-[min(1280px,92vw)] items-start gap-[clamp(34px,5vw,72px)] lg:grid-cols-[1fr_1.1fr]">
         <div>
           <Eyebrow>A Sample Menu</Eyebrow>
           <h2 className="mb-4 font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             Curated menus.{' '}
-            <em className="not-italic text-[#f0d6a0]">Exceptional flavours.</em>
+            <em className="not-italic text-[#e11d48]">Exceptional flavours.</em>
           </h2>
           <GoldRule />
-          <p className="max-w-[52ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="max-w-[52ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Every menu begins with a conversation — your tastes, your guests, the season and the story you want the evening to tell.
           </p>
 
           <div className="mt-7 space-y-3">
-            <div className="rounded-sm border border-[#d9b26a]/25 bg-[rgba(217,178,106,0.045)] p-5">
-              <p className="text-[0.9rem] leading-[1.7] text-[#8b9cbb]">
+            <div className="rounded-sm border border-[#e11d48]/40 bg-[rgba(225,29,72,0.1)] p-5">
+              <p className="text-[0.9rem] leading-[1.7] text-[#4a5873]">
                 Looking for something more personal? Custom menus are available based on your preferences, dietary requirements and occasion.
               </p>
               <a
                 href="#contact"
-                className="group mt-4 inline-flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 hover:gap-3"
+                className="group mt-4 inline-flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 hover:gap-3"
               >
                 Request a Custom Menu
                 <Arrow />
               </a>
             </div>
-            <p className="text-[0.8rem] text-[#63748f]">
+            <p className="text-[0.8rem] text-[#6b7790]">
               For restaurant clients, selected menus and dishes developed by Chef Adex can also be showcased here on request.
             </p>
           </div>
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-3 -z-10 hidden rounded-sm border border-[#d9b26a]/20 lg:block" />
-          <div className="overflow-hidden rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#0a1428]/70 to-[#03060d]/60">
-            <div className="flex items-center justify-between border-b border-white/[0.075] px-6 py-4">
-              <span className="font-serif text-[1.05rem] tracking-[0.06em] text-[#f0d6a0]">
+          <div className="pointer-events-none absolute -inset-3 -z-10 hidden rounded-sm border border-[#e11d48]/30 lg:block" />
+          <div className="overflow-hidden rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/70 to-white/60">
+            <div className="flex items-center justify-between border-b border-black/[0.075] px-6 py-4">
+              <span className="font-serif text-[1.05rem] tracking-[0.06em] text-[#e11d48]">
                 Tasting Menu · Winter
               </span>
-              <span className="text-[0.58rem] uppercase tracking-[0.22em] text-[#63748f]">
+              <span className="text-[0.58rem] uppercase tracking-[0.22em] text-[#6b7790]">
                 4 Courses
               </span>
             </div>
@@ -821,13 +915,13 @@ function Menus() {
               {SAMPLE_MENU.map((m, i, arr) => (
                 <li
                   key={m.course}
-                  className={`px-6 py-5 ${i !== arr.length - 1 ? 'border-b border-white/[0.075]' : ''}`}
+                  className={`px-6 py-5 ${i !== arr.length - 1 ? 'border-b border-black/[0.075]' : ''}`}
                 >
-                  <span className="mb-1 block text-[0.56rem] uppercase tracking-[0.26em] text-[#d9b26a]">
+                  <span className="mb-1 block text-[0.56rem] uppercase tracking-[0.26em] text-[#e11d48]">
                     {m.course}
                   </span>
-                  <h3 className="mb-1 font-serif text-[1.15rem] text-[#e9eef8]">{m.dish}</h3>
-                  <p className="text-[0.84rem] leading-[1.65] text-[#8b9cbb]">{m.desc}</p>
+                  <h3 className="mb-1 font-serif text-[1.15rem] text-[#0b1426]">{m.dish}</h3>
+                  <p className="text-[0.84rem] leading-[1.65] text-[#4a5873]">{m.desc}</p>
                 </li>
               ))}
             </ul>
@@ -879,15 +973,15 @@ const EXPERIENCES = [
 
 function Experiences() {
   return (
-    <section id="experiences" className="bg-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section id="experiences" className="bg-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-12 flex flex-col items-center text-center">
           <Eyebrow center>Experiences</Eyebrow>
           <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             Choose the shape of{' '}
-            <em className="not-italic text-[#f0d6a0]">your evening.</em>
+            <em className="not-italic text-[#e11d48]">your evening.</em>
           </h2>
-          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Every experience is priced according to your date, location, guest count and menu. Request a quote and Chef Adex will design a proposal that fits.
           </p>
         </div>
@@ -897,29 +991,29 @@ function Experiences() {
             <div
               key={e.n}
               className={`group relative flex flex-col overflow-hidden rounded-sm border p-6 transition-all duration-500 hover:-translate-y-1.5 ${e.featured
-                  ? 'border-[#d9b26a]/40 bg-gradient-to-b from-[rgba(217,178,106,0.09)] to-[#03060d]/40 shadow-[0_40px_80px_-40px_rgba(217,178,106,0.35)]'
-                  : 'border-white/[0.075] bg-gradient-to-b from-[#0a1428]/60 to-[#03060d]/30 hover:border-[#d9b26a]/30'
+                  ? 'border-[#e11d48]/60 bg-gradient-to-b from-[rgba(225,29,72,0.16)] to-white/40 shadow-[0_40px_80px_-40px_rgba(225,29,72,0.5)]'
+                  : 'border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/60 to-white/30 hover:border-[#e11d48]/50'
                 }`}
             >
               {e.featured && (
-                <span className="absolute right-3 top-3 rounded-full border border-[#d9b26a]/40 bg-[rgba(3,6,13,0.85)] px-2.5 py-0.5 text-[0.52rem] uppercase tracking-[0.22em] text-[#d9b26a]">
+                <span className="absolute right-3 top-3 rounded-full border border-[#e11d48]/60 bg-[rgba(255,255,255,0.9)] px-2.5 py-0.5 text-[0.52rem] uppercase tracking-[0.22em] text-[#e11d48]">
                   Most Requested
                 </span>
               )}
-              <span className="mb-4 font-serif text-[0.8rem] tracking-[0.06em] text-[#a8843f]">
+              <span className="mb-4 font-serif text-[0.8rem] tracking-[0.06em] text-[#e11d48]">
                 {e.n}
               </span>
-              <h3 className="mb-1.5 font-serif text-[1.22rem] leading-tight text-[#e9eef8]">
+              <h3 className="mb-1.5 font-serif text-[1.22rem] leading-tight text-[#0b1426]">
                 {e.name}
               </h3>
-              <span className="mb-4 text-[0.58rem] uppercase tracking-[0.22em] text-[#63748f]">
+              <span className="mb-4 text-[0.58rem] uppercase tracking-[0.22em] text-[#6b7790]">
                 {e.range}
               </span>
-              <p className="mb-5 text-[0.84rem] leading-[1.7] text-[#8b9cbb]">{e.desc}</p>
+              <p className="mb-5 text-[0.84rem] leading-[1.7] text-[#4a5873]">{e.desc}</p>
               <ul className="mb-6 mt-auto space-y-2">
                 {e.features.map((f) => (
-                  <li key={f} className="flex gap-2 text-[0.8rem] text-[#8b9cbb]">
-                    <span className="text-[#d9b26a]">·</span>
+                  <li key={f} className="flex gap-2 text-[0.8rem] text-[#4a5873]">
+                    <span className="text-[#e11d48]">·</span>
                     {f}
                   </li>
                 ))}
@@ -927,8 +1021,8 @@ function Experiences() {
               <a
                 href="#contact"
                 className={`group/btn mt-auto inline-flex items-center justify-center gap-2 rounded-sm px-5 py-3 text-[0.64rem] uppercase tracking-[0.2em] transition-all duration-500 ${e.featured
-                    ? 'bg-gradient-to-br from-[#d9b26a] to-[#a8843f] text-[#03060d] hover:shadow-[0_18px_40px_-14px_rgba(217,178,106,0.72)]'
-                    : 'border border-white/15 text-[#e9eef8] hover:border-[#d9b26a] hover:bg-[#d9b26a]/5 hover:text-[#d9b26a]'
+                    ? 'bg-gradient-to-br from-[#e11d48] to-[#be123c] text-white hover:shadow-[0_18px_40px_-14px_rgba(225,29,72,0.72)]'
+                    : 'border border-black/15 text-[#0b1426] hover:border-[#e11d48] hover:bg-[#e11d48]/10 hover:text-[#e11d48]'
                   }`}
               >
                 Request a Quote
@@ -957,15 +1051,15 @@ const OCCASIONS = [
 
 function Occasions() {
   return (
-    <section className="bg-gradient-to-b from-[#03060d] to-[#050b16] py-[clamp(56px,7vw,96px)]">
+    <section className="bg-gradient-to-b from-white to-[#faf8f3] py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-12 flex flex-col items-center text-center">
           <Eyebrow center>For Your Occasion</Eyebrow>
           <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             What are you{' '}
-            <em className="not-italic text-[#f0d6a0]">celebrating?</em>
+            <em className="not-italic text-[#e11d48]">celebrating?</em>
           </h2>
-          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Tell us the moment. Chef Adex will shape the experience around it.
           </p>
         </div>
@@ -975,14 +1069,14 @@ function Occasions() {
             <a
               key={o.t}
               href="#contact"
-              className="group flex items-start gap-4 rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#0a1428]/50 to-[#03060d]/30 p-5 transition-all duration-500 hover:-translate-y-1 hover:border-[#d9b26a]/30 hover:from-[#132648]/50"
+              className="group flex items-start gap-4 rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/50 to-white/30 p-5 transition-all duration-500 hover:-translate-y-1 hover:border-[#e11d48]/50 hover:from-[#ebe5d6]/50"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#d9b26a]/30 text-[1rem] text-[#d9b26a] transition-all duration-500 group-hover:-rotate-[10deg] group-hover:bg-[#d9b26a] group-hover:text-[#03060d]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#e11d48]/50 text-[1rem] text-[#e11d48] transition-all duration-500 group-hover:-rotate-[10deg] group-hover:bg-[#e11d48] group-hover:text-white">
                 {o.ic}
               </span>
               <div className="flex-1">
-                <h3 className="mb-1.5 font-serif text-[1.1rem] text-[#e9eef8]">{o.t}</h3>
-                <p className="text-[0.82rem] leading-[1.6] text-[#8b9cbb]">{o.d}</p>
+                <h3 className="mb-1.5 font-serif text-[1.1rem] text-[#0b1426]">{o.t}</h3>
+                <p className="text-[0.82rem] leading-[1.6] text-[#4a5873]">{o.d}</p>
               </div>
             </a>
           ))}
@@ -996,43 +1090,136 @@ function Occasions() {
    Portfolio
    ============================================================ */
 
-const PORTFOLIO = [
-  { cat: 'dining', src: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80', alt: 'Plated dish' },
-  { cat: 'dining', src: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80', alt: 'Table setting' },
-  { cat: 'dining', src: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80', alt: 'Private dining' },
-  { cat: 'classes', src: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=80', alt: 'Culinary class' },
-  { cat: 'classes', src: 'https://images.unsplash.com/photo-1581349485608-9469926a8e5e?auto=format&fit=crop&w=900&q=80', alt: 'Hands-on cooking' },
-  { cat: 'classes', src: 'https://images.unsplash.com/photo-1565895405138-6c3a1555da6a?auto=format&fit=crop&w=900&q=80', alt: 'Students cooking' },
-  { cat: 'restaurant', src: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80', alt: 'Restaurant dish' },
-  { cat: 'restaurant', src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80', alt: 'Menu development' },
-  { cat: 'restaurant', src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80', alt: 'Plated dish' },
+type MediaItem = { type: 'image' | 'video'; src: string; poster?: string; alt: string }
+
+// Cloudinary can serve the first frame of a video as a JPG — used as the thumbnail
+const posterFor = (url: string) =>
+  url.replace('/video/upload/', '/video/upload/so_0,w_900,q_auto,f_jpg/').replace(/\.mp4$/, '.jpg')
+
+// Weave photos and videos together so the grid feels mixed
+const PORTFOLIO: MediaItem[] = (() => {
+  const out: MediaItem[] = []
+  const max = Math.max(IMAGE_URLS.length, VIDEO_URLS.length)
+  for (let i = 0; i < max; i++) {
+    if (IMAGE_URLS[i]) out.push({ type: 'image', src: IMAGE_URLS[i], alt: `Chef Adex — photo ${i + 1}` })
+    if (VIDEO_URLS[i])
+      out.push({ type: 'video', src: VIDEO_URLS[i], poster: posterFor(VIDEO_URLS[i]), alt: `Chef Adex — video ${i + 1}` })
+  }
+  return out
+})()
+
+type Filter = 'all' | 'image' | 'video'
+
+const FILTERS: { id: Filter; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'image', label: 'Photos' },
+  { id: 'video', label: 'Videos' },
 ]
 
-const FILTERS: { id: 'all' | 'dining' | 'classes' | 'restaurant'; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'dining', label: 'Private Dining' },
-  { id: 'classes', label: 'Culinary Classes' },
-  { id: 'restaurant', label: 'Restaurant Projects' },
-]
+function Lightbox({
+  items,
+  index,
+  onClose,
+  onChange,
+}: {
+  items: MediaItem[]
+  index: number
+  onClose: () => void
+  onChange: (i: number) => void
+}) {
+  const item = items[index]
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowRight') onChange((index + 1) % items.length)
+      if (e.key === 'ArrowLeft') onChange((index - 1 + items.length) % items.length)
+    }
+    window.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [index, items.length, onClose, onChange])
+
+  const btn =
+    'absolute z-10 grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-[#e11d48] hover:text-white'
+
+  return (
+    <div
+      className="fixed inset-0 z-[3000] flex items-center justify-center bg-[#0b1426]/92 p-4 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <button aria-label="Close" onClick={onClose} className={`${btn} right-4 top-4`}>
+        ✕
+      </button>
+      <button
+        aria-label="Previous"
+        onClick={(e) => {
+          e.stopPropagation()
+          onChange((index - 1 + items.length) % items.length)
+        }}
+        className={`${btn} left-3 top-1/2 -translate-y-1/2 sm:left-6`}
+      >
+        ←
+      </button>
+      <button
+        aria-label="Next"
+        onClick={(e) => {
+          e.stopPropagation()
+          onChange((index + 1) % items.length)
+        }}
+        className={`${btn} right-3 top-1/2 -translate-y-1/2 sm:right-6`}
+      >
+        →
+      </button>
+
+      <div className="relative max-h-[88vh] w-full max-w-[1000px]" onClick={(e) => e.stopPropagation()}>
+        {item.type === 'video' ? (
+          <video
+            key={item.src}
+            src={item.src}
+            poster={item.poster}
+            controls
+            autoPlay
+            playsInline
+            className="mx-auto max-h-[88vh] w-auto max-w-full rounded-sm bg-black"
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.src} alt={item.alt} className="mx-auto max-h-[88vh] w-auto max-w-full rounded-sm object-contain" />
+        )}
+        <div className="mt-3 text-center text-[0.6rem] uppercase tracking-[0.24em] text-white/60">
+          {index + 1} / {items.length}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function Portfolio() {
-  const [filter, setFilter] = useState<'all' | 'dining' | 'classes' | 'restaurant'>('all')
+  const [filter, setFilter] = useState<Filter>('all')
+  const [lightbox, setLightbox] = useState<number | null>(null)
 
   const visible = useMemo(
-    () => (filter === 'all' ? PORTFOLIO : PORTFOLIO.filter((p) => p.cat === filter)),
+    () => (filter === 'all' ? PORTFOLIO : PORTFOLIO.filter((p) => p.type === filter)),
     [filter]
   )
 
   return (
-    <section id="portfolio" className="bg-[#050b16] py-[clamp(56px,7vw,96px)]">
+    <section id="portfolio" className="bg-[#faf8f3] py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-9 flex flex-col items-center text-center">
           <Eyebrow center>Portfolio</Eyebrow>
           <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             The full{' '}
-            <em className="not-italic text-[#f0d6a0]">experience.</em>
+            <em className="not-italic text-[#e11d48]">experience.</em>
           </h2>
-          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Dishes, tables, students, projects — a visual record of the experiences Chef Adex has created with clients.
           </p>
         </div>
@@ -1043,8 +1230,8 @@ function Portfolio() {
               key={f.id}
               onClick={() => setFilter(f.id)}
               className={`rounded-full border px-4 py-1.5 text-[0.62rem] uppercase tracking-[0.2em] transition-all duration-500 ${filter === f.id
-                  ? 'border-[#d9b26a] bg-[#d9b26a] text-[#03060d]'
-                  : 'border-white/15 text-[#8b9cbb] hover:border-[#d9b26a]/40 hover:text-[#d9b26a]'
+                  ? 'border-[#e11d48] bg-[#e11d48] text-white'
+                  : 'border-black/15 text-[#4a5873] hover:border-[#e11d48]/60 hover:text-[#e11d48]'
                 }`}
             >
               {f.label}
@@ -1056,21 +1243,35 @@ function Portfolio() {
           {visible.map((p, i) => (
             <figure
               key={p.src}
-              className={`group relative m-0 overflow-hidden rounded-sm bg-[#0a1428] ${i === 0 && filter === 'all' ? 'col-span-2 aspect-[16/10] lg:row-span-2 lg:aspect-auto' : 'aspect-square'
+              onClick={() => setLightbox(i)}
+              className={`group relative m-0 cursor-pointer overflow-hidden rounded-sm bg-[#f3efe6] ${i === 0 && filter === 'all' ? 'col-span-2 aspect-[16/10] lg:row-span-2 lg:aspect-auto' : 'aspect-square'
                 }`}
             >
               <Image
-                src={p.src}
+                src={p.type === 'video' ? p.poster! : p.src}
                 alt={p.alt}
                 fill
                 sizes="(max-width: 1024px) 50vw, 400px"
-                className="object-cover brightness-[0.82] saturate-[0.85] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
+                className="object-cover brightness-[0.92] saturate-[0.9] transition-all duration-1000 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:saturate-100"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#03060d]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0b1426]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              {p.type === 'video' && (
+                <span className="absolute inset-0 grid place-items-center">
+                  <span className="grid h-14 w-14 place-items-center rounded-full border border-white/50 bg-black/35 text-white backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-[#e11d48] group-hover:text-white">
+                    <svg viewBox="0 0 24 24" className="ml-0.5 h-5 w-5" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </span>
+              )}
             </figure>
           ))}
         </div>
       </div>
+
+      {lightbox !== null && visible[lightbox] && (
+        <Lightbox items={visible} index={lightbox} onClose={() => setLightbox(null)} onChange={setLightbox} />
+      )}
     </section>
   )
 }
@@ -1134,13 +1335,13 @@ function Testimonials() {
   ]
 
   return (
-    <section className="bg-gradient-to-b from-[#050b16] to-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section className="bg-gradient-to-b from-[#faf8f3] to-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-9 flex flex-col items-center text-center">
           <Eyebrow center>Testimonials</Eyebrow>
           <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             Can you trust Chef Adex with{' '}
-            <em className="not-italic text-[#f0d6a0]">your evening?</em>
+            <em className="not-italic text-[#e11d48]">your evening?</em>
           </h2>
         </div>
 
@@ -1150,8 +1351,8 @@ function Testimonials() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`rounded-full border px-4 py-1.5 text-[0.62rem] uppercase tracking-[0.2em] transition-all duration-500 ${tab === t.id
-                  ? 'border-[#d9b26a] bg-[#d9b26a] text-[#03060d]'
-                  : 'border-white/15 text-[#8b9cbb] hover:border-[#d9b26a]/40 hover:text-[#d9b26a]'
+                  ? 'border-[#e11d48] bg-[#e11d48] text-white'
+                  : 'border-black/15 text-[#4a5873] hover:border-[#e11d48]/60 hover:text-[#e11d48]'
                 }`}
             >
               {t.label}
@@ -1163,14 +1364,14 @@ function Testimonials() {
           {visible.map((t, i) => (
             <blockquote
               key={i}
-              className="group relative m-0 flex flex-col rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#132648]/30 to-[#03060d]/20 px-6 pb-6 pt-10 transition-all duration-500 hover:-translate-y-1 hover:border-[#d9b26a]/30"
+              className="group relative m-0 flex flex-col rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#ebe5d6]/40 to-white/20 px-6 pb-6 pt-10 transition-all duration-500 hover:-translate-y-1 hover:border-[#e11d48]/50"
             >
-              <span className="absolute left-5 top-1 font-serif text-[4rem] leading-none text-[#a8843f]/40">&ldquo;</span>
-              <span className="mb-3 text-[0.56rem] uppercase tracking-[0.22em] text-[#d9b26a]">{t.cat}</span>
-              <p className="mb-5 flex-1 font-serif text-[1rem] italic leading-[1.6] text-[#e9eef8]">{t.q}</p>
-              <footer className="flex flex-col gap-0.5 border-t border-white/[0.075] pt-4">
-                <strong className="font-serif text-[0.95rem] font-medium tracking-[0.02em] text-[#f0d6a0]">{t.a}</strong>
-                <span className="text-[0.62rem] uppercase tracking-[0.22em] text-[#63748f]">{t.r}</span>
+              <span className="absolute left-5 top-1 font-serif text-[4rem] leading-none text-[#e11d48]/30">&ldquo;</span>
+              <span className="mb-3 text-[0.56rem] uppercase tracking-[0.22em] text-[#e11d48]">{t.cat}</span>
+              <p className="mb-5 flex-1 font-serif text-[1rem] italic leading-[1.6] text-[#0b1426]">{t.q}</p>
+              <footer className="flex flex-col gap-0.5 border-t border-black/[0.075] pt-4">
+                <strong className="font-serif text-[0.95rem] font-medium tracking-[0.02em] text-[#e11d48]">{t.a}</strong>
+                <span className="text-[0.62rem] uppercase tracking-[0.22em] text-[#6b7790]">{t.r}</span>
               </footer>
             </blockquote>
           ))}
@@ -1193,29 +1394,29 @@ const STEPS = [
 
 function HowItWorks() {
   return (
-    <section className="bg-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section className="bg-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-12 flex flex-col items-center text-center">
           <Eyebrow center>How It Works</Eyebrow>
           <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             Booking is{' '}
-            <em className="not-italic text-[#f0d6a0]">simple.</em>
+            <em className="not-italic text-[#e11d48]">simple.</em>
           </h2>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <div key={s.n} className="relative">
-              <div className="h-full rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#0a1428]/50 to-[#03060d]/30 p-5 transition-all duration-500 hover:-translate-y-1 hover:border-[#d9b26a]/30">
+              <div className="h-full rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/50 to-white/30 p-5 transition-all duration-500 hover:-translate-y-1 hover:border-[#e11d48]/50">
                 <div className="mb-4 flex items-center gap-3">
-                  <span className="font-serif text-[2rem] leading-none text-[#d9b26a]">{s.n}</span>
-                  <span className="h-px flex-1 bg-gradient-to-r from-[#d9b26a]/50 to-transparent" />
+                  <span className="font-serif text-[2rem] leading-none text-[#e11d48]">{s.n}</span>
+                  <span className="h-px flex-1 bg-gradient-to-r from-[#e11d48]/70 to-transparent" />
                 </div>
-                <h3 className="mb-2 font-serif text-[1.1rem] leading-snug text-[#e9eef8]">{s.t}</h3>
-                <p className="text-[0.82rem] leading-[1.65] text-[#8b9cbb]">{s.d}</p>
+                <h3 className="mb-2 font-serif text-[1.1rem] leading-snug text-[#0b1426]">{s.t}</h3>
+                <p className="text-[0.82rem] leading-[1.65] text-[#4a5873]">{s.d}</p>
               </div>
               {i < STEPS.length - 1 && (
-                <span className="absolute -right-2.5 top-1/2 hidden -translate-y-1/2 text-[#d9b26a]/40 lg:block">→</span>
+                <span className="absolute -right-2.5 top-1/2 hidden -translate-y-1/2 text-[#e11d48] lg:block">→</span>
               )}
             </div>
           ))}
@@ -1231,12 +1432,12 @@ function HowItWorks() {
 
 function Locations() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#03060d] to-[#050b16] py-[clamp(56px,7vw,96px)]">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white to-[#faf8f3] py-[clamp(56px,7vw,96px)]">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 20% 30%, rgba(217,178,106,0.06), transparent 40%), radial-gradient(circle at 80% 70%, rgba(26,49,96,0.5), transparent 45%)',
+            'radial-gradient(circle at 20% 30%, rgba(225,29,72,0.12), transparent 40%), radial-gradient(circle at 80% 70%, rgba(200,214,240,0.45), transparent 45%)',
         }}
       />
       <div className="relative mx-auto grid w-[min(1280px,92vw)] items-center gap-[clamp(34px,5vw,72px)] lg:grid-cols-2">
@@ -1244,17 +1445,17 @@ function Locations() {
           <Eyebrow>Service Locations</Eyebrow>
           <h2 className="mb-4 font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             Private dining across{' '}
-            <em className="not-italic text-[#f0d6a0]">Lagos &amp; beyond.</em>
+            <em className="not-italic text-[#e11d48]">Lagos &amp; beyond.</em>
           </h2>
           <GoldRule />
-          <p className="max-w-[52ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="max-w-[52ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Chef Adex is available for private dining experiences in Lagos and select destinations by request — including Abuja, Port Harcourt, Accra and other cities across West Africa.
           </p>
 
           <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3">
             {['Lagos', 'Abuja', 'Port Harcourt', 'Accra', 'By Request', 'Destination'].map((c) => (
-              <div key={c} className="flex items-center gap-2.5 text-[0.88rem] text-[#8b9cbb]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#d9b26a]" />
+              <div key={c} className="flex items-center gap-2.5 text-[0.88rem] text-[#4a5873]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#e11d48]" />
                 {c}
               </div>
             ))}
@@ -1263,7 +1464,7 @@ function Locations() {
           <div className="mt-7">
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#d9b26a]/35 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#d9b26a] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#d9b26a] hover:text-[#03060d]"
+              className="group inline-flex items-center gap-2.5 rounded-sm border border-[#e11d48]/50 px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-[#e11d48] transition-all duration-500 hover:-translate-y-0.5 hover:bg-[#e11d48] hover:text-white"
             >
               Check Availability in Your City
               <Arrow />
@@ -1271,16 +1472,16 @@ function Locations() {
           </div>
         </div>
 
-        <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-white/[0.075] bg-[#0a1428]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-black/[0.075] bg-[#f3efe6]">
           <Image
-            src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80"
+            src={IMAGE_URLS[7]}
             alt="Chef Adex in Lagos"
             fill
             sizes="(max-width: 1024px) 100vw, 600px"
-            className="object-cover brightness-[0.85] saturate-[0.85]"
+            className="object-cover brightness-[0.92] saturate-[0.9]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#03060d]/70 via-transparent to-transparent" />
-          <div className="absolute bottom-5 left-5 rounded-sm border border-[#d9b26a]/30 bg-[rgba(3,6,13,0.85)] px-3.5 py-2 text-[0.6rem] uppercase tracking-[0.22em] text-[#d9b26a] backdrop-blur-md">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b1426]/70 via-transparent to-transparent" />
+          <div className="absolute bottom-5 left-5 rounded-sm border border-[#e11d48]/40 bg-[rgba(255,255,255,0.92)] px-3.5 py-2 text-[0.6rem] uppercase tracking-[0.22em] text-[#e11d48] backdrop-blur-md">
             Based in Lagos, Nigeria
           </div>
         </div>
@@ -1311,22 +1512,22 @@ function FAQ() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section className="bg-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section className="bg-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-10 grid items-end gap-8 lg:grid-cols-2">
           <div>
             <Eyebrow>FAQ</Eyebrow>
             <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
               Questions,{' '}
-              <em className="not-italic text-[#f0d6a0]">answered.</em>
+              <em className="not-italic text-[#e11d48]">answered.</em>
             </h2>
           </div>
-          <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Everything clients usually ask before booking. If your question isn&apos;t here, message Chef Adex directly on WhatsApp.
           </p>
         </div>
 
-        <div className="mx-auto max-w-[900px] divide-y divide-white/[0.075] border-y border-white/[0.075]">
+        <div className="mx-auto max-w-[900px] divide-y divide-black/[0.075] border-y border-black/[0.075]">
           {FAQS.map((f, i) => {
             const isOpen = open === i
             return (
@@ -1336,15 +1537,15 @@ function FAQ() {
                   className="flex w-full items-center justify-between gap-5 py-5 text-left transition-colors duration-300"
                 >
                   <span
-                    className={`font-serif text-[1.02rem] transition-colors duration-300 sm:text-[1.15rem] ${isOpen ? 'text-[#f0d6a0]' : 'text-[#e9eef8]'
+                    className={`font-serif text-[1.02rem] transition-colors duration-300 sm:text-[1.15rem] ${isOpen ? 'text-[#e11d48]' : 'text-[#0b1426]'
                       }`}
                   >
                     {f.q}
                   </span>
                   <span
                     className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-all duration-500 ${isOpen
-                        ? 'rotate-45 border-[#d9b26a] bg-[#d9b26a] text-[#03060d]'
-                        : 'border-white/15 text-[#d9b26a]'
+                        ? 'rotate-45 border-[#e11d48] bg-[#e11d48] text-white'
+                        : 'border-black/15 text-[#e11d48]'
                       }`}
                   >
                     <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -1357,7 +1558,7 @@ function FAQ() {
                     }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="max-w-[70ch] pb-5 pr-10 text-[0.9rem] leading-[1.75] text-[#8b9cbb]">
+                    <p className="max-w-[70ch] pb-5 pr-10 text-[0.9rem] leading-[1.75] text-[#4a5873]">
                       {f.a}
                     </p>
                   </div>
@@ -1393,19 +1594,19 @@ function EnquiryForm() {
   }
 
   const inputCls =
-    'w-full border-b border-white/[0.075] bg-transparent px-1 py-3 font-serif text-[0.98rem] text-[#e9eef8] transition-colors focus:border-[#d9b26a] focus:outline-none placeholder:font-sans placeholder:text-[0.85rem] placeholder:text-[#63748f]'
+    'w-full border-b border-black/15 bg-transparent px-1 py-3 font-serif text-[0.98rem] text-[#0b1426] transition-colors focus:border-[#e11d48] focus:outline-none placeholder:font-sans placeholder:text-[0.85rem] placeholder:text-[#6b7790]'
   const selectCls = inputCls + ' appearance-none'
 
   return (
-    <section id="contact" className="bg-gradient-to-b from-[#050b16] to-[#03060d] py-[clamp(56px,7vw,96px)]">
+    <section id="contact" className="bg-gradient-to-b from-[#faf8f3] to-white py-[clamp(56px,7vw,96px)]">
       <div className="mx-auto w-[min(1280px,92vw)]">
         <div className="mb-9 flex flex-col items-center text-center">
           <Eyebrow center>Enquire</Eyebrow>
           <h2 className="font-serif text-[clamp(1.85rem,4vw,3rem)] leading-[1.06] tracking-[-0.01em]">
             How can Chef Adex{' '}
-            <em className="not-italic text-[#f0d6a0]">work with you?</em>
+            <em className="not-italic text-[#e11d48]">work with you?</em>
           </h2>
-          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#8b9cbb]">
+          <p className="mt-4 max-w-[58ch] text-[0.94rem] leading-[1.8] text-[#4a5873]">
             Choose the service that fits. The form adapts to what you need — and you can always reach Chef Adex directly on WhatsApp.
           </p>
         </div>
@@ -1419,9 +1620,9 @@ function EnquiryForm() {
                 ['Email', 'hello@chefadex.com'],
                 ['Based in', 'Lagos, Nigeria'],
               ].map(([label, value]) => (
-                <li key={label} className="rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#0a1428]/50 to-[#03060d]/20 p-4">
-                  <span className="mb-0.5 block text-[0.56rem] uppercase tracking-[0.26em] text-[#63748f]">{label}</span>
-                  <span className="font-serif text-[1rem] text-[#e9eef8]">{value}</span>
+                <li key={label} className="rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#f3efe6]/50 to-white/20 p-4">
+                  <span className="mb-0.5 block text-[0.56rem] uppercase tracking-[0.26em] text-[#6b7790]">{label}</span>
+                  <span className="font-serif text-[1rem] text-[#0b1426]">{value}</span>
                 </li>
               ))}
             </ul>
@@ -1436,17 +1637,17 @@ function EnquiryForm() {
               Message on WhatsApp
             </a>
 
-            <p className="mt-5 text-[0.78rem] leading-relaxed text-[#63748f]">
+            <p className="mt-5 text-[0.78rem] leading-relaxed text-[#6b7790]">
               Prefer to skip the form? WhatsApp is the fastest way to reach Chef Adex directly — voice notes welcome.
             </p>
           </div>
 
-          <div className="rounded-sm border border-white/[0.075] bg-gradient-to-b from-[#132648]/35 to-[#03060d]/30 p-6 sm:p-9">
+          <div className="rounded-sm border border-black/[0.075] bg-gradient-to-b from-[#ebe5d6]/40 to-white/30 p-6 sm:p-9">
             {sent ? (
               <div className="py-10 text-center">
-                <span className="mb-5 inline-grid h-12 w-12 place-items-center rounded-full border border-[#d9b26a]/30 bg-[#d9b26a]/10 text-[1.2rem] text-[#d9b26a]">✓</span>
-                <h3 className="mb-2 font-serif text-[1.7rem] text-[#f0d6a0]">Thank you.</h3>
-                <p className="mx-auto max-w-[42ch] text-[0.9rem] leading-[1.7] text-[#8b9cbb]">
+                <span className="mb-5 inline-grid h-12 w-12 place-items-center rounded-full border border-[#e11d48]/50 bg-[#e11d48]/15 text-[1.2rem] text-[#e11d48]">✓</span>
+                <h3 className="mb-2 font-serif text-[1.7rem] text-[#e11d48]">Thank you.</h3>
+                <p className="mx-auto max-w-[42ch] text-[0.9rem] leading-[1.7] text-[#4a5873]">
                   Your request has been received. Chef Adex or the team will reply within one business day.
                 </p>
               </div>
@@ -1459,8 +1660,8 @@ function EnquiryForm() {
                       type="button"
                       onClick={() => setService(t.id)}
                       className={`rounded-full border px-4 py-1.5 text-[0.62rem] uppercase tracking-[0.18em] transition-all duration-500 ${service === t.id
-                          ? 'border-[#d9b26a] bg-[#d9b26a] text-[#03060d]'
-                          : 'border-white/15 text-[#8b9cbb] hover:border-[#d9b26a]/40 hover:text-[#d9b26a]'
+                          ? 'border-[#e11d48] bg-[#e11d48] text-white'
+                          : 'border-black/15 text-[#4a5873] hover:border-[#e11d48]/60 hover:text-[#e11d48]'
                         }`}
                     >
                       {t.label}
@@ -1591,7 +1792,7 @@ function EnquiryForm() {
 
                 <button
                   type="submit"
-                  className="group inline-flex w-full items-center justify-center gap-2.5 rounded-sm bg-gradient-to-br from-[#d9b26a] to-[#a8843f] px-7 py-3.5 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-[#03060d] shadow-[0_10px_34px_-12px_rgba(217,178,106,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-14px_rgba(217,178,106,0.72)]"
+                  className="group inline-flex w-full items-center justify-center gap-2.5 rounded-sm bg-gradient-to-br from-[#e11d48] to-[#be123c] px-7 py-3.5 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-white shadow-[0_10px_34px_-12px_rgba(225,29,72,0.55)] transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-14px_rgba(225,29,72,0.72)]"
                 >
                   {service === 'consulting' ? 'Request a Consultation' : 'Request Your Experience'}
                   <Arrow />
@@ -1616,7 +1817,7 @@ function Field({
 }) {
   return (
     <label className={`flex flex-col gap-2 ${className}`}>
-      <span className="text-[0.58rem] uppercase tracking-[0.24em] text-[#63748f]">{label}</span>
+      <span className="text-[0.58rem] uppercase tracking-[0.24em] text-[#6b7790]">{label}</span>
       {children}
     </label>
   )
@@ -1628,19 +1829,19 @@ function Field({
 
 function Footer() {
   return (
-    <footer className="border-t border-white/[0.075] bg-[#03060d] pb-6 pt-14">
+    <footer className="border-t border-black/[0.075] bg-white pb-6 pt-14">
       <div className="mx-auto grid w-[min(1280px,92vw)] gap-8 pb-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] lg:gap-10">
         <div>
           <div className="mb-4 flex items-center gap-3 font-serif text-[1.2rem] tracking-[0.06em]">
-            <span className="grid h-8 w-8 place-items-center rounded-full border border-[#d9b26a]/30 text-[0.75rem] text-[#d9b26a]">CA</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full border border-[#e11d48]/60 text-[0.75rem] text-[#e11d48]">CA</span>
             <span className="flex flex-col">
               Chef Adex
-              <small className="mt-0.5 font-sans text-[0.5rem] font-normal uppercase tracking-[0.32em] text-[#63748f]">
+              <small className="mt-0.5 font-sans text-[0.5rem] font-normal uppercase tracking-[0.32em] text-[#6b7790]">
                 Private Chef · Lagos
               </small>
             </span>
           </div>
-          <p className="max-w-[34ch] text-[0.85rem] leading-[1.75] text-[#63748f]">
+          <p className="max-w-[34ch] text-[0.85rem] leading-[1.75] text-[#6b7790]">
             Restaurant-quality private dining, culinary classes and menu curation — created around you.
           </p>
           <div className="mt-5 flex gap-2.5">
@@ -1649,7 +1850,7 @@ function Footer() {
                 key={s}
                 href="#"
                 aria-label={s}
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/[0.075] text-[0.56rem] uppercase tracking-wider text-[#8b9cbb] transition-all duration-500 hover:border-[#d9b26a] hover:text-[#d9b26a]"
+                className="grid h-9 w-9 place-items-center rounded-full border border-black/[0.075] text-[0.56rem] uppercase tracking-wider text-[#4a5873] transition-all duration-500 hover:border-[#e11d48] hover:text-[#e11d48]"
               >
                 {s[0]}
               </a>
@@ -1666,7 +1867,7 @@ function Footer() {
             ['Portfolio', '#portfolio'],
           ].map(([t, h]) => (
             <li key={t}>
-              <a href={h} className="font-serif text-[0.95rem] text-[#8b9cbb] transition-colors hover:text-[#d9b26a]">{t}</a>
+              <a href={h} className="font-serif text-[0.95rem] text-[#4a5873] transition-colors hover:text-[#e11d48]">{t}</a>
             </li>
           ))}
         </FooterColumn>
@@ -1679,24 +1880,24 @@ function Footer() {
             ['Consulting', '#menu-curation'],
           ].map(([t, h]) => (
             <li key={t}>
-              <a href={h} className="font-serif text-[0.95rem] text-[#8b9cbb] transition-colors hover:text-[#d9b26a]">{t}</a>
+              <a href={h} className="font-serif text-[0.95rem] text-[#4a5873] transition-colors hover:text-[#e11d48]">{t}</a>
             </li>
           ))}
         </FooterColumn>
 
         <FooterColumn title="Contact">
-          <li className="font-serif text-[0.95rem] text-[#8b9cbb]">hello@chefadex.com</li>
-          <li className="font-serif text-[0.95rem] text-[#8b9cbb]">+234 800 000 0000</li>
-          <li className="font-serif text-[0.95rem] text-[#8b9cbb]">Lagos, Nigeria</li>
+          <li className="font-serif text-[0.95rem] text-[#4a5873]">hello@chefadex.com</li>
+          <li className="font-serif text-[0.95rem] text-[#4a5873]">+234 800 000 0000</li>
+          <li className="font-serif text-[0.95rem] text-[#4a5873]">Lagos, Nigeria</li>
           <li>
-            <a href="#contact" className="font-serif text-[0.95rem] text-[#d9b26a] transition-colors hover:text-[#f0d6a0]">
+            <a href="#contact" className="font-serif text-[0.95rem] text-[#e11d48] transition-colors hover:text-[#be123c]">
               Book an Experience →
             </a>
           </li>
         </FooterColumn>
       </div>
 
-      <div className="mx-auto flex w-[min(1280px,92vw)] flex-wrap justify-between gap-4 border-t border-white/[0.075] pt-6 text-[0.7rem] tracking-[0.06em] text-[#63748f]">
+      <div className="mx-auto flex w-[min(1280px,92vw)] flex-wrap justify-between gap-4 border-t border-black/[0.075] pt-6 text-[0.7rem] tracking-[0.06em] text-[#6b7790]">
         <span>© {new Date().getFullYear()} Chef Adex. All rights reserved.</span>
         <span>Lagos · Abuja · Accra · By request</span>
       </div>
@@ -1707,7 +1908,7 @@ function Footer() {
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h4 className="mb-4 font-sans text-[0.62rem] font-medium uppercase tracking-[0.26em] text-[#63748f]">{title}</h4>
+      <h4 className="mb-4 font-sans text-[0.62rem] font-medium uppercase tracking-[0.26em] text-[#6b7790]">{title}</h4>
       <ul className="flex flex-col gap-2.5">{children}</ul>
     </div>
   )
@@ -1748,7 +1949,7 @@ export default function Home() {
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
       <div
-        className="fixed left-0 top-0 z-[2000] h-[2px] bg-gradient-to-r from-[#a8843f] to-[#f0d6a0] shadow-[0_0_14px_rgba(217,178,106,0.6)] transition-[width] duration-100"
+        className="fixed left-0 top-0 z-[2000] h-[2px] bg-gradient-to-r from-[#e11d48] to-[#fb7185] shadow-[0_0_14px_rgba(225,29,72,0.6)] transition-[width] duration-100"
         style={{ width: `${progress}%` }}
       />
 
